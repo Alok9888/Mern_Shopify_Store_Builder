@@ -8,8 +8,10 @@ function App() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("All")
 
+  // categories from products
   const categories = ["All",...new Set(allProducts.map(p => p.category))]
 
+  // filter by search and category
   const filtered = useMemo(() => {
     return allProducts.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase())
@@ -19,58 +21,49 @@ function App() {
   }, [search, category])
 
   const addToCart = (product) => {
-    setCart(prev => [...prev, product])
+    setCart([...cart, product])
   }
 
   return (
-    <div className="min-h-screen bg-[#FCF9F6] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#f8f8f8]">
       <Navbar cartCount={cart.length} />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* top section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-5xl font-black tracking-tighter">STORE<span className="text-[#FF4D00]">.</span></h1>
-            <p className="text-[#8A7F7A] mt-2 text-sm">Shopify solutions for high-growth brands — by ITGeeks</p>
+            <h1 className="text-3xl font-bold tracking-tight">Store</h1>
+            <p className="text-gray-500 text-sm mt-1">Services we build at ITGeeks</p>
           </div>
-
-          <div className="flex gap-3">
+          {/* search and filter controls */}
+          <div className="flex gap-2">
             <input
               placeholder="Search services..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="border border-[#E8E0D9] bg-white px-5 py-3 rounded-full text-sm w-64 outline-none focus:ring-2 focus:ring-[#FF4D00]/20 focus:border-[#FF4D00]"
+              className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm w-full md:w-64 outline-none focus:border-black"
             />
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="border border-[#E8E0D9] bg-white px-5 py-3 rounded-full text-sm outline-none"
+              className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
             >
               {categories.map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          <div className="bg-white border border-[#E8E0D9] rounded-2xl p-5">
-            <div className="text-3xl font-black">{filtered.length}</div>
-            <div className="text-xs text-[#8A7F7A] uppercase tracking-widest mt-1">Services Available</div>
-          </div>
-          <div className="bg-white border border-[#E8E0D9] rounded-2xl p-5">
-            <div className="text-3xl font-black">{cart.length}</div>
-            <div className="text-xs text-[#8A7F7A] uppercase tracking-widest mt-1">In Your Cart</div>
-          </div>
-          <div className="bg-[#1A1A1A] text-[#FCF9F6] rounded-2xl p-5">
-            <div className="text-3xl font-black"><span className="text-[#FF4D00]">MERN</span> + Docker</div>
-            <div className="text-xs text-[#8A7F7A] uppercase tracking-widest mt-1">Production Stack</div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* products grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {filtered.map(p => (
             <ProductCard key={p.id} product={p} onAdd={addToCart} />
           ))}
         </div>
-      </main>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-16 text-gray-400 text-sm">No products found</div>
+        )}
+      </div>
     </div>
   )
 }

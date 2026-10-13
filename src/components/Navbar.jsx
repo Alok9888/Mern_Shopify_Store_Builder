@@ -1,19 +1,16 @@
-export default function Navbar({ cartCount = 0 }) {
+export default function Navbar({ cartCount }) {
   return (
-    <nav className="bg-[#FCF9F6]/80 backdrop-blur-xl border-b border-[#E8E0D9] sticky top-0 z-10">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#FF4D00] text-white flex items-center justify-center rounded-full font-black text-sm">I</div>
-          <span className="font-black text- tracking-tighter">ITGEEKS<span className="font-normal text-[#8A7F7A]"> STORE</span></span>
-          <span className="text- bg-[#1A1A1A] text-white px-2.5 py-1 rounded-full ml-2 tracking-widest uppercase">Mern</span>
+    // simple sticky navbar
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-black text-white rounded-md flex items-center justify-center text-xs font-bold">I</div>
+          <span className="font-semibold text-sm">ITGEEKS STORE</span>
         </div>
-        <div className="flex gap-3 items-center">
-          <div className="text-sm">
-            <span className="bg-[#1A1A1A] text-white px-4 py-2 rounded-full text-xs font-medium">Cart • {cartCount}</span>
-          </div>
-          <button className="bg-[#FF4D00] text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-[#E64400] transition">
-            Admin
-          </button>
+        <div className="flex items-center gap-3">
+          {/* cart count from props */}
+          <span className="text-sm bg-gray-100 px-3 py-1.5 rounded-full">Cart {cartCount}</span>
+          <button className="text-sm bg-black text-white px-4 py-1.5 rounded-full">Admin</button>
         </div>
       </div>
     </nav>
