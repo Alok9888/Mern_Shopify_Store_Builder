@@ -1,27 +1,23 @@
+import { Link } from "react-router-dom"
+
 export default function ProductCard({ product, onAdd }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition">
-      {/* product icon */}
-      <div className="bg-gray-50 rounded-lg h-36 flex items-center justify-center mb-3 text-3xl">
-        {product.emoji}
-      </div>
-
-      <div className="mb-3">
-        <h3 className="font-medium text-sm leading-tight">{product.name}</h3>
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="text- bg-gray-100 px-2 py-0.5 rounded text-gray-600">{product.category}</span>
+    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-black transition">
+      <Link to={`/product/${product.id}`}>
+        <div className="bg-[#f8f8f8] rounded-lg h-28 flex items-center justify-center text-3xl mb-3">
+          {product.emoji}
         </div>
-        <p className="text-xs text-gray-500 mt-2 leading-relaxed">{product.desc}</p>
-      </div>
-
-      {/* price and button */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-        <span className="font-semibold text-sm">${product.price}</span>
-        <button
+        <div className="text-xs bg-gray-100 px-2 py-1 rounded w-fit">{product.category}</div>
+        <h3 className="font-semibold mt-2 text-sm">{product.name}</h3>
+        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+      </Link>
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+        <span className="text-sm font-bold">₹{product.price}</span>
+        <button 
           onClick={() => onAdd(product)}
-          className="text-xs bg-black text-white px-3.5 py-2 rounded-lg hover:bg-gray-900 transition"
+          className="bg-black text-white text-xs px-3 py-1.5 rounded-lg hover:bg-zinc-800"
         >
-          Add to cart
+          Add
         </button>
       </div>
     </div>
