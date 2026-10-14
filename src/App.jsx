@@ -1,51 +1,17 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
-import ProductCard from "./components/ProductCard"
 import { products as allProducts } from "./data/products"
+
+import StorePage from "./pages/StorePage"
 import ProductDetail from "./pages/ProductDetail"
 import CartPage from "./pages/CartPage"
 
-function StorePage({ cart, addToCart, search, setSearch, category, setCategory, categories, filtered }) {
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Store</h1>
-          <p className="text-gray-500 text-sm mt-1">Services we build at ITGeeks</p>
-        </div>
-        <div className="flex gap-2">
-          <input
-            placeholder="Search services..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm w-full md:w-64 outline-none focus:border-black"
-          />
-          <select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
-          >
-            {categories.map(c => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {filtered.map(p => (
-          <ProductCard key={p.id} product={p} onAdd={addToCart} />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-16 text-gray-400 text-sm">No products found</div>
-      )}
-    </div>
-  )
-}
-
 function App() {
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem("cart")
+    return saved? JSON.parse(saved) : []
+  })
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("All")
 
@@ -57,31 +23,68 @@ function App() {
       const matchCat = category === "All" || p.category === category
       return matchSearch && matchCat
     })
-  }, [search, category])  
+  }, [search, category])
+
+  // save cart to localStorage whenever cart changes
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart))
+  }, [cart])
 
   const addToCart = (product) => {
-    setCart([...cart, product])
+    setCart(prev => {
+      const exists = prev.find(item => item.id === product.id)
+      if (exists) {
+        return prev.map(item =>
+          item.id === product.id? {...item, qty: item.qty + 1 } : item
+        )
+      }
+      return [...prev, {...product, qty: 1 }]
+    })
   }
+
+  const removeFromCart = (id) => {
+    setCart(prev => prev.filter(item => item.id!== id))
+  }
+
+  const decreaseQty = (id) => {
+    setCart(prev => {
+      return prev.map(item => {
+        if (item.id === id) {
+          if (item.qty === 1) return null // will be filtered
+          return {...item, qty: item.qty - 1 }
+        }
+        return item
+      }).filter(Boolean)
+    })
+  }
+
+  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
 
   return (
     <div className="min-h-screen bg-[#f8f8f8]">
-      <Navbar cartCount={cart.length} />
+      <Navbar cartCount={cartCount} />
 
       <Routes>
         <Route path="/" element={
-          <StorePage 
-            cart={cart} 
-            addToCart={addToCart} 
-            search={search} 
-            setSearch={setSearch} 
-            category={category} 
-            setCategory={setCategory} 
-            categories={categories} 
-            filtered={filtered} 
+          <StorePage
+            filtered={filtered}
+            search={search}
+            setSearch={setSearch}
+            category={category}
+            setCategory={setCategory}
+            categories={categories}
+            addToCart={addToCart}
           />
         } />
         <Route path="/product/:id" element={<ProductDetail onAdd={addToCart} />} />
-        <Route path="/cart" element={<CartPage cart={cart} />} />
+        <Route path="/cart" element={
+          <CartPage
+            cart={cart}
+            removeFromCart={removeFromCart}
+            addToCart={addToCart}
+            decreaseQty={decreaseQty}
+          />
+        } />
       </Routes>
     </div>
   )
