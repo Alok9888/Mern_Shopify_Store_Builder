@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
-import { products as allProducts } from "./data/products"
-
 import StorePage from "./pages/StorePage"
 import ProductDetail from "./pages/ProductDetail"
 import CartPage from "./pages/CartPage"
 
 function App() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart")
     return saved? JSON.parse(saved) : []
@@ -15,15 +15,29 @@ function App() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("All")
 
-  const categories = ["All",...new Set(allProducts.map(p => p.category))]
+  const categories = ["All",...new Set(products.map(p => p.category))]
 
-  const filtered = useMemo(() => {
-    return allProducts.filter(p => {
+    const filtered = useMemo(() => {
+    return products.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase())
       const matchCat = category === "All" || p.category === category
       return matchSearch && matchCat
     })
-  }, [search, category])
+  }, [products, search, category])
+
+  // also fix loading on error
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.log(err)
+        setLoading(false)
+      })
+  }, [])
 
   // save cart to localStorage whenever cart changes
   useEffect(() => {
@@ -59,6 +73,7 @@ function App() {
   }
 
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
+  if (loading) return <div className="p-10 text-center text-xl">Loading products from backend...</div>
 
   return (
     <div className="min-h-screen bg-[#f8f8f8]">
