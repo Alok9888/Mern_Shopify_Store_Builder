@@ -27,7 +27,7 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filtered.map(p => (
-          <ProductCard key={p.id} product={p} onAdd={addToCart} />
+          <ProductCard key={p._id} product={p} onAdd={addToCart} />
         ))}
       </div>
 

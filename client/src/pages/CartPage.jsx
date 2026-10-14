@@ -18,7 +18,7 @@ export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty 
 
       <div className="mt-6 space-y-3">
         {cart.map((p) => (
-          <div key={p.id} className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+          <div key={p._id} className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <span className="text-xl">{p.emoji}</span>
               <div>
@@ -27,11 +27,11 @@ export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty 
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => decreaseQty(p.id)} className="w-7 h-7 bg-gray-100 rounded text-sm">-</button>
+              <button onClick={() => decreaseQty(p._id)} className="w-7 h-7 bg-gray-100 rounded text-sm">-</button>
               <span className="text-sm w-4 text-center">{p.qty}</span>
               <button onClick={() => addToCart(p)} className="w-7 h-7 bg-gray-100 rounded text-sm">+</button>
               <span className="text-sm font-semibold ml-3">₹{p.price * p.qty}</span>
-              <button onClick={() => removeFromCart(p.id)} className="text-xs text-red-500 ml-3">Remove</button>
+              <button onClick={() => removeFromCart(p._id)} className="text-xs text-red-500 ml-3">Remove</button>
             </div>
           </div>
         ))}

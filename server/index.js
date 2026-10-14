@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import connectDB from "./config/db.js"
-import Product from "./models/Product.js"
+import Product from "./models/product.js"
 
 dotenv.config()
 
@@ -15,16 +15,26 @@ app.use(express.json())
 connectDB()
 
 // get all products
+// get all products
 app.get("/api/products", async (req, res) => {
-  const products = await Product.find()
-  res.json(products)
+  try {
+    const products = await Product.find()
+    res.json(products)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
 })
 
 // get one product by id
 app.get("/api/products/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id)
-  if (!product) return res.status(404).json({ message: "not found" })
-  res.json(product)
+  try {
+    const product = await Product.findById(req.params.id)
+    if (!product) return res.status(404).json({ message: "not found" })
+    res.json(product)
+  } catch (err) {
+    console.log(err.message)
+    res.status(500).json({ message: err.message })
+  }
 })
 
 // seed - run once to add data

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export default function ProductCard({ product, onAdd }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-black transition">
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${product._id}`}>
         <div className="bg-[#f8f8f8] rounded-lg h-28 flex items-center justify-center text-3xl mb-3">
           {product.emoji}
         </div>

@@ -44,33 +44,36 @@ function App() {
     localStorage.setItem("cart", JSON.stringify(cart))
   }, [cart])
 
-  const addToCart = (product) => {
-    setCart(prev => {
-      const exists = prev.find(item => item.id === product.id)
-      if (exists) {
-        return prev.map(item =>
-          item.id === product.id? {...item, qty: item.qty + 1 } : item
-        )
-      }
-      return [...prev, {...product, qty: 1 }]
-    })
-  }
+ // addToCart
+const addToCart = (product) => {
+  setCart(prev => {
+    const exists = prev.find(item => item._id === product._id)
+    if (exists) {
+      return prev.map(item =>
+        item._id === product._id? {...item, qty: item.qty + 1 } : item
+      )
+    }
+    return [...prev, {...product, qty: 1 }]
+  })
+}
 
-  const removeFromCart = (id) => {
-    setCart(prev => prev.filter(item => item.id!== id))
-  }
+const removeFromCart = (id) => {
+  setCart(prev => prev.filter(item => item._id !== id))
+}
 
-  const decreaseQty = (id) => {
-    setCart(prev => {
-      return prev.map(item => {
-        if (item.id === id) {
-          if (item.qty === 1) return null // will be filtered
+const decreaseQty = (id) => {
+  setCart(prev => {
+    return prev
+      .map(item => {
+        if (item._id === id) {
+          if (item.qty === 1) return null
           return {...item, qty: item.qty - 1 }
         }
         return item
-      }).filter(Boolean)
-    })
-  }
+      })
+      .filter(Boolean)
+  })
+}
 
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
   if (loading) return <div className="p-10 text-center text-xl">Loading products from backend...</div>
