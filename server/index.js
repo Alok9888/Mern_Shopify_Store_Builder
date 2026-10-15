@@ -1,76 +1,24 @@
 import express from "express"
+import mongoose from "mongoose"
 import cors from "cors"
 import dotenv from "dotenv"
-import connectDB from "./config/db.js"
+import productRoutes from "./routes/productRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
 import Product from "./models/product.js"
-import orderRoutes from "./routes/orders.js"
 
 dotenv.config()
-
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-// db connect
-connectDB()
-
+// routes
+app.use("/api/products", productRoutes)
 app.use("/api/orders", orderRoutes)
 
-// get all products
-// get all products
-app.get("/api/products", async (req, res) => {
-  try {
-    const products = await Product.find()
-    res.json(products)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-})
+app.get("/", (req, res) => res.send("api running"))
 
-// get one product by id
-app.get("/api/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id)
-    if (!product) return res.status(404).json({ message: "not found" })
-    res.json(product)
-  } catch (err) {
-    console.log(err.message)
-    res.status(500).json({ message: err.message })
-  }
-})
-
-// add product
-app.post("/api/products", async (req, res) => {
-  try {
-    const product = await Product.create(req.body)
-    res.status(201).json(product)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-})
-
-// delete product
-app.delete("/api/products/:id", async (req, res) => {
-  try {
-    await Product.findByIdAndDelete(req.params.id)
-    res.json({ message: "deleted" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-})
-
-// update product
-app.put("/api/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    res.json(product)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-})
-
-// seed - run once to add data
+// seed - keep here for one-time use
 app.post("/api/seed", async (req, res) => {
   await Product.deleteMany({})
   const products = await Product.insertMany([
@@ -86,11 +34,5 @@ app.post("/api/seed", async (req, res) => {
   res.json(products)
 })
 
-// test
-app.get("/", (req, res) => {
-  res.send("api running")
-})
-
-app.listen(5000, () => {
-  console.log("backend on 5000")
-})
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => app.listen(5000, () => console.log("Server on 5000")))
