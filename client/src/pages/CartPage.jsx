@@ -39,8 +39,10 @@ export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty 
 
       <div className="mt-6 bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-center">
         <div className="font-bold">Total: ₹{total}</div>
-        <button className="bg-black text-white px-5 py-2 rounded-lg text-sm">Checkout</button>
-      </div>
+        <Link to="/checkout" className="bg-black text-white px-4 py-2 rounded text-sm">
+          Checkout
+        </Link>
+        </div>
     </div>
   )
 }

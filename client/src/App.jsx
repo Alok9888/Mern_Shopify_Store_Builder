@@ -5,6 +5,7 @@ import StorePage from "./pages/StorePage"
 import ProductDetail from "./pages/ProductDetail"
 import CartPage from "./pages/CartPage"
 import AdminPage from "./pages/AdminPage"
+import CheckoutPage from "./pages/CheckoutPage"
 
 function App() {
   const [products, setProducts] = useState([])
@@ -27,6 +28,7 @@ function App() {
     })
   }, [products, search, category])
 
+  //Loads Products (StorePage, Admin)
  const fetchProducts = async () => {
   try {
     setLoading(true)
@@ -52,7 +54,10 @@ useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart))
   }, [cart])
 
- // addToCart
+//clears cart (Passed in Checkout Page)
+const clearCart = () => setCart([])
+
+//(StorePage, ProductDetail)
 const addToCart = (product) => {
   setCart(prev => {
     const exists = prev.find(item => item._id === product._id)
@@ -65,10 +70,12 @@ const addToCart = (product) => {
   })
 }
 
+//(Cart Page)
 const removeFromCart = (id) => {
   setCart(prev => prev.filter(item => item._id !== id))
 }
 
+//(Cart Page)
 const decreaseQty = (id) => {
   setCart(prev => {
     return prev
@@ -113,6 +120,7 @@ const decreaseQty = (id) => {
           />
         } />
         <Route path="/admin" element={<AdminPage products={products} refresh={fetchProducts} />} />
+        <Route path="/checkout" element={<CheckoutPage cart={cart} clearCart={clearCart} />} />
       </Routes>
     </div>
   )

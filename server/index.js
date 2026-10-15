@@ -3,6 +3,7 @@ import cors from "cors"
 import dotenv from "dotenv"
 import connectDB from "./config/db.js"
 import Product from "./models/product.js"
+import orderRoutes from "./routes/orders.js"
 
 dotenv.config()
 
@@ -13,6 +14,8 @@ app.use(express.json())
 
 // db connect
 connectDB()
+
+app.use("/api/orders", orderRoutes)
 
 // get all products
 // get all products
