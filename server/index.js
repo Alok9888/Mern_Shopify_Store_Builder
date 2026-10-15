@@ -37,6 +37,36 @@ app.get("/api/products/:id", async (req, res) => {
   }
 })
 
+// add product
+app.post("/api/products", async (req, res) => {
+  try {
+    const product = await Product.create(req.body)
+    res.status(201).json(product)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// delete product
+app.delete("/api/products/:id", async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id)
+    res.json({ message: "deleted" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// update product
+app.put("/api/products/:id", async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    res.json(product)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 // seed - run once to add data
 app.post("/api/seed", async (req, res) => {
   await Product.deleteMany({})

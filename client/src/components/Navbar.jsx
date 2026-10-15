@@ -9,7 +9,9 @@ export default function Navbar({ cartCount }) {
           <Link to="/cart" className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg">
             Cart {cartCount}
           </Link>
-          <button className="text-sm bg-black text-white px-3 py-1.5 rounded-lg">Admin</button>
+          <Link to="/admin" className="text-sm bg-black text-white px-3 py-1.5 rounded-lg">
+            Admin
+          </Link>
         </div>
       </div>
     </div>

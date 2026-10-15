@@ -4,10 +4,12 @@ import Navbar from "./components/Navbar"
 import StorePage from "./pages/StorePage"
 import ProductDetail from "./pages/ProductDetail"
 import CartPage from "./pages/CartPage"
+import AdminPage from "./pages/AdminPage"
 
 function App() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart")
     return saved? JSON.parse(saved) : []
@@ -25,19 +27,25 @@ function App() {
     })
   }, [products, search, category])
 
-  // also fix loading on error
-  useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
-  }, [])
+ const fetchProducts = async () => {
+  try {
+    setLoading(true)
+    setError(null)
+    const res = await fetch("http://localhost:5000/api/products")
+    if (!res.ok) throw new Error(`Server error: ${res.status}`)
+    const data = await res.json()
+    setProducts(data)
+  } catch (err) {
+    console.log(err)
+    setError(err.message)
+  } finally {
+    setLoading(false) // always runs - success or error
+  }
+}
+
+useEffect(() => {
+  fetchProducts()
+}, [])
 
   // save cart to localStorage whenever cart changes
   useEffect(() => {
@@ -77,7 +85,8 @@ const decreaseQty = (id) => {
 
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
   if (loading) return <div className="p-10 text-center text-xl">Loading products from backend...</div>
-
+  
+  //routing
   return (
     <div className="min-h-screen bg-[#f8f8f8]">
       <Navbar cartCount={cartCount} />
@@ -103,6 +112,7 @@ const decreaseQty = (id) => {
             decreaseQty={decreaseQty}
           />
         } />
+        <Route path="/admin" element={<AdminPage products={products} refresh={fetchProducts} />} />
       </Routes>
     </div>
   )
