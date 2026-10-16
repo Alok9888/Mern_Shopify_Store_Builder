@@ -6,7 +6,7 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Store</h1>
-          <p className="text-gray-500 text-sm mt-1">Services we build at ITGeeks</p>
+          <p className="text-gray-500 text-sm mt-1">Services we build at our platform</p>
         </div>
         <div className="flex gap-2">
           <input

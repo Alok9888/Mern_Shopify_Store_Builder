@@ -1,20 +1,25 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
-import dotenv from "dotenv"
 import productRoutes from "./routes/productRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
-import Product from "./models/product.js"
+import Product from "./models/Product.js"
+import adminAuthRoutes from "./routes/adminAuthRoutes.js"
+import paymentRoutes from "./routes/paymentRoutes.js"
 
-dotenv.config()
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use("/api/payment", paymentRoutes)
 
 // routes
 app.use("/api/products", productRoutes)
 app.use("/api/orders", orderRoutes)
+app.use("/api/admin-auth", adminAuthRoutes)
+
 
 app.get("/", (req, res) => res.send("api running"))
 

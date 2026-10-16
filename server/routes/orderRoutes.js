@@ -1,5 +1,6 @@
 import express from "express"
 import Order from "../models/Order.js"
+import adminProtect from "../middleware/adminAuth.js"
 const router = express.Router()
 
 router.post("/", async (req, res) => {
@@ -11,7 +12,7 @@ router.post("/", async (req, res) => {
   }
 })
 
-router.get("/", async (req, res) => {
+router.get("/", adminProtect, async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 })
   res.json(orders)
 })
