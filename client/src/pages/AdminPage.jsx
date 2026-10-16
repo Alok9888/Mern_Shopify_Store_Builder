@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/AuthContext.jsx"
+import { API_BASE_URL } from "../config.js"
 
 const ORDER_STATUSES = ["new", "processing", "shipped", "completed", "cancelled"]
 
@@ -44,7 +45,7 @@ export default function AdminPage({ products, refresh }) {
     setOrdersLoading(true)
     setOrdersError("")
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await response.json()
@@ -79,7 +80,7 @@ export default function AdminPage({ products, refresh }) {
     setUpdatingOrderId(orderId)
     setOrdersError("")
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +108,7 @@ export default function AdminPage({ products, refresh }) {
   const handleAdd = async (event) => {
     event.preventDefault()
     try {
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +127,7 @@ export default function AdminPage({ products, refresh }) {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })

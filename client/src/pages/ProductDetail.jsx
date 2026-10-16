@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
+import { API_BASE_URL } from "../config.js"
 
 const ProductDetail = ({ addToCart }) => {
   const { id } = useParams()
@@ -12,7 +13,7 @@ const ProductDetail = ({ addToCart }) => {
       setLoading(true)
 
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`)
+        const res = await fetch(`${API_BASE_URL}/api/products/${id}`)
 
         if (!res.ok) {
           setProduct(null)

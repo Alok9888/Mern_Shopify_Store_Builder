@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom"
+import { getCartTotal } from "../utils/cart.js"
 
 export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty }) {
-  const total = cart.reduce((sum, p) => sum + p.price * p.qty, 0)
+  const total = getCartTotal(cart)
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0)
 
   if (cart.length === 0) {

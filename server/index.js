@@ -3,6 +3,7 @@ dotenv.config()
 import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
+import crypto from "node:crypto"
 import productRoutes from "./routes/productRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import Product from "./models/Product.js"
@@ -11,7 +12,12 @@ import paymentRoutes from "./routes/paymentRoutes.js"
 
 const app = express()
 
-app.use(cors())
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+app.use(cors({ origin: allowedOrigins }))
 app.use(express.json())
 app.use("/api/payment", paymentRoutes)
 
@@ -25,6 +31,17 @@ app.get("/", (req, res) => res.send("api running"))
 
 // seed - keep here for one-time use
 app.post("/api/seed", async (req, res) => {
+  const seedSecret = process.env.SEED_SECRET
+  const suppliedSecret = req.get("x-seed-secret") || ""
+
+  if (!seedSecret) return res.sendStatus(404)
+
+  const expected = Buffer.from(seedSecret)
+  const supplied = Buffer.from(suppliedSecret)
+  if (expected.length !== supplied.length || !crypto.timingSafeEqual(expected, supplied)) {
+    return res.sendStatus(401)
+  }
+
   await Product.deleteMany({})
   const products = await Product.insertMany([
     { name: "Shopify Store Setup", price: 5000, category: "Shopify", emoji: "🛒", description: "Complete Shopify store with theme setup" },
@@ -40,4 +57,11 @@ app.post("/api/seed", async (req, res) => {
 })
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => app.listen(5000, () => console.log("Server on 5000")))
+  .then(() => {
+    const port = process.env.PORT || 5000
+    app.listen(port, "0.0.0.0", () => console.log(`Server listening on ${port}`))
+  })
+  .catch((error) => {
+    console.error("Could not connect to MongoDB:", error)
+    process.exit(1)
+  })

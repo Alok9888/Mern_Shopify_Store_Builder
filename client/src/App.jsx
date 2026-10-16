@@ -9,8 +9,15 @@ import CheckoutPage from "./pages/CheckoutPage"
 import AdminLogin from "./pages/AdminLogin"
 import AdminProtected from "./components/AdminProtected"
 import { AuthContext } from "./context/AuthContext"
+import { API_BASE_URL } from "./config.js"
 import OrderSuccess from "./pages/OrderSuccess"
 import PaymentPage from "./pages/PaymentPage"
+import {
+  addItem,
+  removeItem,
+  decreaseItem,
+  getCartCount,
+} from "./utils/cart.js"
 
 
 function AdminRoot() {
@@ -44,7 +51,7 @@ function App() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch("http://localhost:5000/api/products")
+      const res = await fetch(`${API_BASE_URL}/api/products`)
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const data = await res.json()
       setProducts(data)
@@ -66,34 +73,16 @@ function App() {
 
   const clearCart = () => setCart([])
   const addToCart = (product) => {
-    setCart(prev => {
-      const exists = prev.find(item => item._id === product._id)
-      if (exists) {
-        return prev.map(item =>
-          item._id === product._id? {...item, qty: item.qty + 1 } : item
-        )
-      }
-      return [...prev, {...product, qty: 1 }]
-    })
+  setCart((currentCart) => addItem(currentCart, product))
   }
   const removeFromCart = (id) => {
-    setCart(prev => prev.filter(item => item._id!== id))
+  setCart((currentCart) => removeItem(currentCart, id))
   }
   const decreaseQty = (id) => {
-    setCart(prev => {
-      return prev
-       .map(item => {
-          if (item._id === id) {
-            if (item.qty === 1) return null
-            return {...item, qty: item.qty - 1 }
-          }
-          return item
-        })
-       .filter(Boolean)
-    })
+    setCart((currentCart) => decreaseItem(currentCart, id))
   }
 
-  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
+  const cartCount = getCartCount(cart)
   if (loading) return <div className="p-10 text-center text-xl">Loading products from backend...</div>
 
   return (

@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { getCartTotal } from "../utils/cart.js"
+import { API_BASE_URL } from "../config.js"
 
 export default function PaymentPage({ cart, clearCart }) {
   const navigate = useNavigate()
   const shipping = JSON.parse(localStorage.getItem("shippingInfo") || "{}")
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const total = getCartTotal(cart)
   const [method, setMethod] = useState("cod")
   const [processing, setProcessing] = useState(false)
 
@@ -20,7 +22,7 @@ export default function PaymentPage({ cart, clearCart }) {
 
     try {
       if (method === "cod") {
-        const res = await fetch("http://localhost:5000/api/payment/cod", {
+      const res = await fetch(`${API_BASE_URL}/api/payment/cod`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ items: cart, total, customer: shipping }),
@@ -38,7 +40,7 @@ export default function PaymentPage({ cart, clearCart }) {
         return
       }
 
-      const res = await fetch("http://localhost:5000/api/payment/create-order", {
+      const res = await fetch(`${API_BASE_URL}/api/payment/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ total, customer: shipping, items: cart }),
@@ -63,7 +65,7 @@ export default function PaymentPage({ cart, clearCart }) {
         description: "Order Payment",
         handler: async (response) => {
           try {
-            const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+            const verifyRes = await fetch(`${API_BASE_URL}/api/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(response),
