@@ -2,22 +2,37 @@ import { Link } from "react-router-dom"
 
 export default function ProductCard({ product, onAdd }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-black transition">
+    <div className="group overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-violet-300 hover:shadow-xl hover:shadow-violet-100/70">
       <Link to={`/product/${product._id}`}>
-        <div className="bg-[#f8f8f8] rounded-lg h-28 flex items-center justify-center text-3xl mb-3">
-          {product.emoji}
+        <div className="relative mb-4 flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-fuchsia-100 via-violet-100 to-cyan-100 text-5xl transition-all duration-300 group-hover:from-fuchsia-200 group-hover:via-violet-200 group-hover:to-cyan-200">
+          <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/40 blur-2xl transition-transform duration-500 group-hover:scale-150" />
+          <span className="relative drop-shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+            {product.emoji}
+          </span>
         </div>
-        <div className="text-xs bg-gray-100 px-2 py-1 rounded w-fit">{product.category}</div>
-        <h3 className="font-semibold mt-2 text-sm">{product.name}</h3>
-        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+
+        <div className="px-4">
+          <div className="w-fit rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-violet-700 ring-1 ring-violet-100">
+            {product.category}
+          </div>
+          <h3 className="mt-3 text-base font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-violet-700">
+            {product.name}
+          </h3>
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">
+            {product.description}
+          </p>
+        </div>
       </Link>
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-        <span className="text-sm font-bold">₹{product.price}</span>
+
+      <div className="mx-4 mt-4 flex items-center justify-between border-t border-violet-100 py-4">
+        <span className="text-lg font-black tracking-tight text-slate-900">
+          ₹{product.price}
+        </span>
         <button 
           onClick={() => onAdd(product)}
-          className="bg-black text-white text-xs px-3 py-1.5 rounded-lg hover:bg-zinc-800"
+          className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-violet-200 transition-all duration-200 hover:scale-105 hover:from-violet-700 hover:to-fuchsia-700 hover:shadow-lg active:scale-95"
         >
-          Add
+          Add to cart <span className="ml-1">+</span>
         </button>
       </div>
     </div>

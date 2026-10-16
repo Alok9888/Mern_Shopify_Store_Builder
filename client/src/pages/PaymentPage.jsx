@@ -1,93 +1,227 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-export default function PaymentPage({ cart, clearCart }){
+export default function PaymentPage({ cart, clearCart }) {
   const navigate = useNavigate()
   const shipping = JSON.parse(localStorage.getItem("shippingInfo") || "{}")
-  const total = cart.reduce((s,i)=>s+i.price*i.qty,0)
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
   const [method, setMethod] = useState("cod")
+  const [processing, setProcessing] = useState(false)
 
-  const pay = async ()=>{
-  const shipping = JSON.parse(localStorage.getItem("shippingInfo") || "{}")
-  
-  if(method==="cod"){
-    await fetch("http://localhost:5000/api/payment/cod",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ items: cart, total, customer: shipping })
-    })
-    clearCart()
-    navigate("/order-success")
-    return
-  }
+  const pay = async () => {
+    if (processing) return
 
-  // ONLINE - create razorpay order from backend
-  console.log("Creating razorpay order...")
-  const res = await fetch("http://localhost:5000/api/payment/create-order",{
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ total, customer: shipping, items: cart })
-  })
-  const data = await res.json()
-  console.log("Backend returned:", data)
+    if (!cart.length) {
+      alert("Your cart is empty.")
+      return
+    }
 
-  if(!window.Razorpay){
-    alert("Razorpay script not loaded - check index.html")
-    return
-  }
+    setProcessing(true)
 
-  const options = {
-    key: data.key,
-    amount: data.amount,
-    currency: "INR",
-    order_id: data.orderId,
-    name: "ITGEEKS Store",
-    description: "Order Payment",
-    handler: async function(response){
-      console.log("Razorpay response:", response)
-      const verifyRes = await fetch("http://localhost:5000/api/payment/verify",{
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify(response)
-      })
-      const verifyData = await verifyRes.json()
-      if(verifyData.success){
+    try {
+      if (method === "cod") {
+        const res = await fetch("http://localhost:5000/api/payment/cod", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: cart, total, customer: shipping }),
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          throw new Error(data.message || "Could not place your order")
+        }
+
         clearCart()
         localStorage.removeItem("shippingInfo")
         navigate("/order-success")
-      } else {
-        alert("Payment verification failed")
+        return
       }
-    },
-    prefill: shipping,
-    theme: { color: "#000" }
+
+      const res = await fetch("http://localhost:5000/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ total, customer: shipping, items: cart }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || "Could not create payment order")
+      }
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay script not loaded. Check that it is included in index.html.")
+      }
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency || "INR",
+        order_id: data.orderId,
+        name: "ITGEEKS Store",
+        description: "Order Payment",
+        handler: async (response) => {
+          try {
+            const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            })
+
+            const verifyData = await verifyRes.json()
+
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.message || "Payment verification failed")
+            }
+
+            clearCart()
+            localStorage.removeItem("shippingInfo")
+            navigate("/order-success")
+          } catch (error) {
+            alert(error.message || "Could not verify payment")
+          }
+        },
+        prefill: {
+          name: shipping.name || "",
+          email: shipping.email || "",
+          contact: shipping.phone || "",
+        },
+        theme: { color: "#7c3aed" },
+        modal: {
+          ondismiss: () => setProcessing(false),
+        },
+      }
+
+      const razorpay = new window.Razorpay(options)
+
+      razorpay.on("payment.failed", (response) => {
+        setProcessing(false)
+        alert(response.error?.description || "Payment failed. Please try again.")
+      })
+
+      razorpay.open()
+    } catch (error) {
+      console.error("Payment error:", error)
+      alert(error.message || "Something went wrong while processing your order")
+      setProcessing(false)
+    }
   }
 
-  const rzp = new window.Razorpay(options)
-  rzp.open()
-}
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6 flex justify-center">
-      <div className="w-full max-w-4xl grid md:grid-cols-[1.6fr_1fr] gap-6">
-        <div className="bg-white border rounded- p-6 h-fit">
-          <h2 className="text-xl font-bold mb-5">Choose Payment</h2>
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-6 py-10 md:py-14">
+      <div className="mx-auto grid w-full max-w-6xl gap-6 md:grid-cols-[1.5fr_1fr]">
+        <div className="h-fit rounded-3xl border border-violet-100 bg-white p-6 shadow-xl shadow-violet-100/60 md:p-8">
+          <span className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-violet-700">
+            Checkout
+          </span>
+          <h2 className="mb-6 mt-3 text-2xl font-black tracking-tight text-slate-900">
+            Choose payment
+          </h2>
+
           <div className="space-y-3">
-            <label className={`flex items-center gap-3 border rounded-xl p-4 cursor-pointer ${method==='cod'?'border-black':''}`}>
-              <input type="radio" checked={method==='cod'} onChange={()=>setMethod('cod')} />
-              <span className="text-sm font-medium">Cash on Delivery</span>
+            <label
+              className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition ${
+                method === "cod"
+                  ? "border-violet-400 bg-violet-50 ring-4 ring-violet-100"
+                  : "border-slate-200 hover:border-violet-200 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="cod"
+                checked={method === "cod"}
+                onChange={() => setMethod("cod")}
+                className="h-4 w-4 accent-violet-600"
+              />
+              <span>
+                <span className="block text-sm font-extrabold text-slate-900">
+                  Cash on Delivery
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500">
+                  Pay when your order arrives
+                </span>
+              </span>
             </label>
-            <label className={`flex items-center gap-3 border rounded-xl p-4 cursor-pointer ${method==='online'?'border-black':''}`}>
-              <input type="radio" checked={method==='online'} onChange={()=>setMethod('online')} />
-              <span className="text-sm font-medium">Pay Online (UPI / Card) - Mock</span>
+
+            <label
+              className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition ${
+                method === "online"
+                  ? "border-violet-400 bg-violet-50 ring-4 ring-violet-100"
+                  : "border-slate-200 hover:border-violet-200 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="online"
+                checked={method === "online"}
+                onChange={() => setMethod("online")}
+                className="h-4 w-4 accent-violet-600"
+              />
+              <span>
+                <span className="block text-sm font-extrabold text-slate-900">
+                  Pay Online
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500">
+                  UPI, cards, and other Razorpay options
+                </span>
+              </span>
             </label>
           </div>
-          <button onClick={pay} className="w-full h-11 bg-black text-white rounded-xl font-semibold mt-6">
-            {method==='cod'? `Place Order ₹${total}` : `Pay ₹${total}`}
+
+          <button
+            onClick={pay}
+            disabled={processing || cart.length === 0}
+            className="mt-6 h-12 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-extrabold text-white shadow-lg shadow-violet-200 transition hover:from-violet-700 hover:to-fuchsia-700 hover:shadow-xl active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {processing
+              ? "Processing..."
+              : method === "cod"
+                ? `Place Order · ₹${total}`
+                : `Pay Now · ₹${total}`}
           </button>
         </div>
-        <div className="bg-white border rounded- p-6 h-fit">
-          <h3 className="font-bold mb-3">Summary</h3>
-          {cart.map(i=><div key={i._id} className="flex justify-between text-sm py-1"><span>{i.name} x{i.qty}</span><span>₹{i.price*i.qty}</span></div>)}
-          <div className="border-t mt-3 pt-3 flex justify-between font-bold"><span>Total</span><span>₹{total}</span></div>
-          <p className="text-xs text-zinc-500 mt-3">Ship to: {shipping.address}, {shipping.city}</p>
+
+        <div className="h-fit rounded-3xl border border-violet-100 bg-white p-6 shadow-xl shadow-violet-100/60 md:p-8">
+          <h3 className="mb-5 text-lg font-black tracking-tight text-slate-900">
+            Order summary
+          </h3>
+
+          {cart.length === 0 ? (
+            <p className="text-sm text-slate-500">Your cart is empty.</p>
+          ) : (
+            <div className="space-y-3">
+              {cart.map(item => (
+                <div
+                  key={item._id}
+                  className="flex justify-between gap-4 text-sm"
+                >
+                  <span className="font-medium text-slate-600">
+                    {item.name} <span className="text-slate-400">× {item.qty}</span>
+                  </span>
+                  <span className="shrink-0 font-bold text-slate-900">
+                    ₹{item.price * item.qty}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-5 flex justify-between border-t border-violet-100 pt-4 text-base font-black text-slate-900">
+            <span>Total</span>
+            <span>₹{total}</span>
+          </div>
+
+          <div className="mt-5 rounded-2xl bg-violet-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-violet-700">
+              Delivering to
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">
+              {[shipping.address, shipping.city].filter(Boolean).join(", ") || "Address not provided"}
+            </p>
+          </div>
         </div>
       </div>
     </div>

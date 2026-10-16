@@ -112,7 +112,7 @@ function App() {
             addToCart={addToCart}
           />
         } />
-        <Route path="/product/:id" element={<ProductDetail onAdd={addToCart} />} />
+        <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} />} />
         <Route path="/cart" element={
           <CartPage
             cart={cart}
