@@ -9,8 +9,8 @@ export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty 
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-4 py-16">
         <div className="w-full max-w-md rounded-3xl border border-violet-100 bg-white p-10 text-center shadow-xl shadow-violet-100/60">
-          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-100 text-4xl">
-            🛍️
+          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center border border-[#E5E0D8] bg-[#F7F4EF] font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+            Cart
           </div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900">
             Your cart is empty
@@ -53,8 +53,8 @@ export default function CartPage({ cart, removeFromCart, addToCart, decreaseQty 
                 className="flex flex-col gap-4 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5"
               >
                 <div className="flex min-w-0 items-center gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-100 via-violet-100 to-cyan-100 text-3xl">
-                    {p.emoji}
+                  <div className="flex h-16 w-16 shrink-0 items-end border border-[#E5E0D8] bg-[#F7F4EF] p-2 font-mono text-[9px] uppercase tracking-wider text-[#8A8279]">
+                    Item
                   </div>
                   <div className="min-w-0">
                     <h2 className="truncate text-sm font-extrabold text-slate-900">

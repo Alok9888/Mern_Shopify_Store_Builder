@@ -5,7 +5,7 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50">
       {/* Sticky header bar */}
       <div className="border-b border-violet-100 bg-white/85 shadow-sm shadow-violet-100/50 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-6 py-6 md:flex-row md:items-end">
+        <div className="mx-auto flex max-w-5xl flex-col justify-between gap-5 px-6 py-6 md:flex-row md:items-end">
           <div>
             <span className="mb-2 inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-bold uppercase tracking-widest text-violet-700">
               Discover
@@ -41,15 +41,15 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-500">
             <span className="text-violet-700">{filtered.length}</span> services to explore
           </p>
-          <div className="hidden h-px flex-1 bg-gradient-to-r from-violet-200 to-transparent sm:ml-6 sm:block" />
+          <div className="hidden h-px flex-1 bg-[#E5E0D8] sm:ml-6 sm:block" />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {filtered.map(p => (
             <ProductCard key={p._id} product={p} onAdd={addToCart} />
           ))}
@@ -57,8 +57,8 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
 
         {filtered.length === 0 && (
           <div className="mt-8 rounded-3xl border-2 border-dashed border-violet-200 bg-white/80 py-24 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-100 text-3xl text-violet-600">
-              ⌕
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border border-[#E5E0D8] bg-[#F7F4EF] font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+              Search
             </div>
             <p className="text-lg font-extrabold text-slate-800">No services found</p>
             <p className="mt-1 text-sm text-slate-500">Try another search or category.</p>

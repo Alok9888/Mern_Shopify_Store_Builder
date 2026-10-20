@@ -9,6 +9,7 @@ import orderRoutes from "./routes/orderRoutes.js"
 import Product from "./models/Product.js"
 import adminAuthRoutes from "./routes/adminAuthRoutes.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
+import serviceFinderRoutes from "./routes/serviceFinderRoutes.js"
 
 const app = express()
 
@@ -20,6 +21,7 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
 app.use(cors({ origin: allowedOrigins }))
 app.use(express.json())
 app.use("/api/payment", paymentRoutes)
+app.use("/api/assistant", serviceFinderRoutes)
 
 // routes
 app.use("/api/products", productRoutes)

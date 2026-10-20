@@ -83,14 +83,17 @@ function App() {
   }
 
   const cartCount = getCartCount(cart)
-  if (loading) return <div className="p-10 text-center text-xl">Loading products from backend...</div>
-
   return (
-    <div className="min-h-screen bg-[#f8f8f8]">
+    <div className="min-h-screen bg-[#F7F4EF]">
       <Navbar cartCount={cartCount} />
 
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={<AdminRoot />} />
+        <Route path="/store" element={loading ? (
+          <div className="p-10 text-center text-xl">Loading products from backend...</div>
+        ) : error ? (
+          <div className="p-10 text-center text-rose-700">Could not load products: {error}</div>
+        ) : (
           <StorePage
             filtered={filtered}
             search={search}
@@ -100,7 +103,7 @@ function App() {
             categories={categories}
             addToCart={addToCart}
           />
-        } />
+        )} />
         <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} />} />
         <Route path="/cart" element={
           <CartPage

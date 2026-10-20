@@ -143,7 +143,7 @@ export default function AdminPage({ products, refresh }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50">
-      <header className="sticky top-0 z-10 border-b border-violet-100 bg-white/85 shadow-sm shadow-violet-100/50 backdrop-blur-xl">
+      <header className="border-b border-violet-100 bg-white/85 shadow-sm shadow-violet-100/50 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-widest text-violet-600">Dashboard</span>
@@ -151,7 +151,7 @@ export default function AdminPage({ products, refresh }) {
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-800 sm:inline-flex">{email}</span>
-            <button onClick={handleLogout} className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100">Logout</button>
+            <button onClick={handleLogout} className="btn-accent rounded-xl border border-rose-100 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100">Logout</button>
           </div>
         </div>
       </header>
@@ -231,14 +231,13 @@ export default function AdminPage({ products, refresh }) {
             <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Service name" className={inputClass} required />
             <input value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} placeholder="Price" type="number" min="0" step="0.01" className={inputClass} required />
             <input value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} placeholder="Category" className={inputClass} required />
-            <input value={form.emoji} onChange={(event) => setForm({ ...form, emoji: event.target.value })} placeholder="Emoji" className={inputClass} required />
             <input value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder="Description" className={`${inputClass} md:col-span-2`} required />
             <button className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-violet-200 transition hover:from-violet-700 hover:to-fuchsia-700 hover:shadow-xl active:scale-[0.99] md:col-span-2">+ Add service</button>
           </form>
 
           <section className="overflow-hidden rounded-3xl border border-violet-100 bg-white shadow-xl shadow-violet-100/50">
             <div className="flex items-center justify-between border-b border-violet-100 px-6 py-5"><div><h3 className="text-lg font-black text-slate-900">All services</h3><p className="mt-1 text-xs text-slate-500">Manage your store catalog</p></div><span className="rounded-full bg-violet-100 px-3 py-1 text-sm font-extrabold text-violet-700">{products.length}</span></div>
-            {products.length === 0 ? <p className="px-6 py-10 text-center text-sm text-slate-500">No services yet. Add one using the form above.</p> : <div className="divide-y divide-violet-50">{products.map((product) => <div key={product._id} className="flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-violet-50/50"><div className="flex min-w-0 items-center gap-3"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-100 to-violet-100 text-xl">{product.emoji}</span><div className="min-w-0"><p className="truncate text-sm font-extrabold text-slate-900">{product.name}</p><p className="mt-0.5 text-xs font-medium text-violet-700">₹{product.price}</p></div></div><button onClick={() => handleDelete(product._id)} className="shrink-0 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100">Delete</button></div>)}</div>}
+            {products.length === 0 ? <p className="px-6 py-10 text-center text-sm text-slate-500">No services yet. Add one using the form above.</p> : <div className="divide-y divide-violet-50">{products.map((product) => <div key={product._id} className="flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-violet-50/50"><div className="flex min-w-0 items-center gap-3"><span className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E0D8] bg-[#F7F4EF] font-mono text-[10px] uppercase tracking-wider text-[#8A8279]">Item</span><div className="min-w-0"><p className="truncate text-sm font-extrabold text-slate-900">{product.name}</p><p className="mt-0.5 text-xs font-medium text-violet-700">₹{product.price}</p></div></div><button onClick={() => handleDelete(product._id)} className="btn-accent shrink-0 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100">Delete</button></div>)}</div>}
           </section>
         </section>
       </main>

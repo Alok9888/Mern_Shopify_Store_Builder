@@ -41,7 +41,7 @@ export default function AdminLogin() {
         {/* Header */}
         <div className="mb-7 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-xs font-extrabold tracking-widest text-white shadow-lg shadow-violet-200">
-            SHOPIFY <span className="text-white/60">•</span> ADMIN
+            ITGEEKS <span className="text-white/60">/</span> ADMIN
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">
             Welcome back
@@ -103,7 +103,7 @@ export default function AdminLogin() {
               <p className="text-xs font-extrabold uppercase tracking-widest text-violet-700">
                 Demo access
               </p>
-              <span className="text-lg">⚡</span>
+              <span className="font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">Demo</span>
             </div>
 
             <div className="mb-3 grid grid-cols-2 gap-3">
@@ -130,7 +130,7 @@ export default function AdminLogin() {
               onClick={fillDemo}
               className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white text-xs font-extrabold text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
             >
-              <span>⚡</span> Use demo credentials
+              Use demo credentials
             </button>
             <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-400">
               Credentials are provided to showcase the project functionality.

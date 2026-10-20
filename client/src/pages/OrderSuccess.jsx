@@ -4,8 +4,8 @@ export default function OrderSuccess() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-6 py-12">
       <div className="w-full max-w-md rounded-3xl border border-violet-100 bg-white p-10 text-center shadow-2xl shadow-violet-100/70">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-100 to-teal-100 text-4xl font-black text-emerald-600 shadow-inner">
-          ✓
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center border border-[#E5E0D8] bg-[#F7F4EF] font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+          Order
         </div>
 
         <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-emerald-700 ring-1 ring-emerald-100">

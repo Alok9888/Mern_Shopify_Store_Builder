@@ -4,10 +4,9 @@ export default function ProductCard({ product, onAdd }) {
   return (
     <div className="group overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-violet-300 hover:shadow-xl hover:shadow-violet-100/70">
       <Link to={`/product/${product._id}`}>
-        <div className="relative mb-4 flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-fuchsia-100 via-violet-100 to-cyan-100 text-5xl transition-all duration-300 group-hover:from-fuchsia-200 group-hover:via-violet-200 group-hover:to-cyan-200">
-          <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/40 blur-2xl transition-transform duration-500 group-hover:scale-150" />
-          <span className="relative drop-shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-            {product.emoji}
+        <div className="mb-4 flex h-36 items-end border-b border-[#E5E0D8] bg-[#F7F4EF] p-4">
+          <span className="font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+            Service / {product.category}
           </span>
         </div>
 
@@ -30,7 +29,7 @@ export default function ProductCard({ product, onAdd }) {
         </span>
         <button 
           onClick={() => onAdd(product)}
-          className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-violet-200 transition-all duration-200 hover:scale-105 hover:from-violet-700 hover:to-fuchsia-700 hover:shadow-lg active:scale-95"
+          className="card-action-secondary rounded-sm border border-[#E5E0D8] bg-transparent px-4 py-2 text-xs font-medium text-[#1A1816] transition-colors duration-150 hover:bg-[#F7F4EF]"
         >
           Add to cart <span className="ml-1">+</span>
         </button>

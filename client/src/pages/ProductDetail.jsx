@@ -57,8 +57,8 @@ const ProductDetail = ({ addToCart }) => {
     return (
       <div className="flex min-h-[60vh] items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-6">
         <div className="rounded-3xl border border-violet-100 bg-white p-10 text-center shadow-xl shadow-violet-100/60">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-100 text-3xl text-violet-600">
-            ?
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border border-[#E5E0D8] bg-[#F7F4EF] font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+            Item
           </div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900">
             Product not found
@@ -74,11 +74,9 @@ const ProductDetail = ({ addToCart }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-6 py-10 md:py-16">
       <div className="mx-auto grid max-w-6xl overflow-hidden rounded-3xl border border-violet-100 bg-white shadow-2xl shadow-violet-100/70 md:grid-cols-2">
-        <div className="relative flex min-h-72 items-center justify-center overflow-hidden bg-gradient-to-br from-fuchsia-100 via-violet-100 to-cyan-100 p-12 md:min-h-[500px]">
-          <div className="absolute -left-12 -top-12 h-48 w-48 rounded-full bg-white/40 blur-3xl" />
-          <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-fuchsia-300/30 blur-3xl" />
-          <span className="relative text-8xl drop-shadow-md transition-transform duration-300 hover:scale-110 md:text-9xl">
-            {product.emoji}
+        <div className="flex min-h-72 items-end border-b border-[#E5E0D8] bg-[#F7F4EF] p-8 md:min-h-[500px]">
+          <span className="font-mono text-xs uppercase tracking-[0.08em] text-[#8A8279]">
+            Service / {product.category}
           </span>
         </div>
 
