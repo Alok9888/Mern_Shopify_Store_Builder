@@ -2,6 +2,12 @@
 
 An admin-focused service-commerce platform for managing an e-commerce services business. Administrators manage the service catalog and customer orders from a protected dashboard. Customers can browse the catalog, get AI-assisted service recommendations, and place orders using Razorpay or cash on delivery.
 
+## Live application
+
+The live frontend is deployed on Vercel. The backend API can be hosted separately.
+
+[Open the live ITGeeks Store](https://mern-shopify-store-builder.vercel.app/)
+
 ## Features
 
 - **Admin dashboard:** Review orders, update fulfillment status, add and remove services, and review AI recommendation feedback.
@@ -41,14 +47,18 @@ server/
   index.js             Express app and MongoDB connection
 ```
 
-## Requirements
+## Local development
+
+The following setup is for developers who want to run or modify the project locally. It is not needed to use the deployed application.
+
+### Requirements
 
 - Node.js and npm
 - MongoDB connection string (local MongoDB or MongoDB Atlas)
 - Razorpay API keys for the backend to start payment routes
 - OpenAI API key to use the AI service finder (the rest of the app can run without it)
 
-## Setup
+### Setup
 
 The frontend and backend are separate npm applications; install and run each in its own terminal.
 
