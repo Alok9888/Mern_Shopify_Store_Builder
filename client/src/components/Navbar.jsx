@@ -4,6 +4,8 @@ export default function Navbar({ cartCount }) {
   const { pathname } = useLocation()
   const isStorePage = pathname === "/store"
   const isAdminDashboard = pathname === "/admin/dashboard"
+  const isAdminLogin = pathname === "/" || pathname === "/admin"
+  const showCart = !isAdminDashboard && !isAdminLogin
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#E5E0D8] bg-[#F7F4EF]">
@@ -13,7 +15,7 @@ export default function Navbar({ cartCount }) {
         </Link>
 
         <div className="flex items-center gap-3">
-          {!isAdminDashboard && (
+          {showCart && (
             <Link
               to="/cart"
               className="nav-action-secondary inline-flex items-center gap-2 px-4 py-2 text-sm no-underline transition-colors duration-150"

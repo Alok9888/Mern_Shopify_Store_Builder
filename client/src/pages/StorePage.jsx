@@ -1,4 +1,5 @@
 import ProductCard from "../components/ProductCard"
+import ServiceFinder from "../components/ServiceFinder"
 
 export default function StorePage({ filtered, search, setSearch, category, setCategory, categories, addToCart }) {
   return (
@@ -42,6 +43,8 @@ export default function StorePage({ filtered, search, setSearch, category, setCa
       </div>
 
       <div className="mx-auto max-w-5xl px-6 py-10">
+        <ServiceFinder onAdd={addToCart} />
+
         <div className="mb-6 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-500">
             <span className="text-violet-700">{filtered.length}</span> services to explore

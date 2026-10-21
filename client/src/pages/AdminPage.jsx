@@ -40,6 +40,26 @@ export default function AdminPage({ products, refresh }) {
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [updatingOrderId, setUpdatingOrderId] = useState("")
+  const [aiFeedback, setAiFeedback] = useState(null)
+  const [aiFeedbackLoading, setAiFeedbackLoading] = useState(true)
+  const [aiFeedbackError, setAiFeedbackError] = useState("")
+
+  const loadAiFeedback = async () => {
+    setAiFeedbackLoading(true)
+    setAiFeedbackError("")
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/assistant/feedback/admin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message || "Could not load AI feedback")
+      setAiFeedback(data)
+    } catch (error) {
+      setAiFeedbackError(error.message || "Could not load AI feedback")
+    } finally {
+      setAiFeedbackLoading(false)
+    }
+  }
 
   const loadOrders = async () => {
     setOrdersLoading(true)
@@ -59,7 +79,10 @@ export default function AdminPage({ products, refresh }) {
   }
 
   useEffect(() => {
-    if (token) loadOrders()
+    if (token) {
+      loadOrders()
+      loadAiFeedback()
+    }
   }, [token])
 
   const filteredOrders = useMemo(() => {
@@ -157,6 +180,40 @@ export default function AdminPage({ products, refresh }) {
       </header>
 
       <main className="mx-auto max-w-7xl space-y-12 px-6 py-10">
+        <section>
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <span className="inline-flex rounded-full bg-[#E5E0D8] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1A1816]">AI evaluation</span>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Service finder feedback</h2>
+              <p className="mt-1 text-sm text-slate-500">Review customer ratings to see how relevant recommendations are.</p>
+            </div>
+            <button onClick={loadAiFeedback} disabled={aiFeedbackLoading} className="rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-sm font-bold text-violet-700 transition hover:bg-violet-50 disabled:opacity-50">
+              {aiFeedbackLoading ? "Refreshing…" : "↻ Refresh feedback"}
+            </button>
+          </div>
+          {aiFeedbackError && <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{aiFeedbackError}</p>}
+          <div className="mb-5 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "AI requests", value: aiFeedback?.totalRequests ?? "—" },
+              { label: "Customer ratings", value: aiFeedback?.ratedRequests ?? "—" },
+              { label: "Marked helpful", value: aiFeedback?.helpfulRate == null ? "—" : `${aiFeedback.helpfulRate}%` },
+            ].map((stat) => <div key={stat.label} className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm"><p className="text-xs font-bold uppercase tracking-wider text-slate-400">{stat.label}</p><p className="mt-1 text-2xl font-black text-slate-900">{stat.value}</p></div>)}
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white">
+            {aiFeedbackLoading && !aiFeedback ? <p className="px-6 py-8 text-center text-sm text-slate-500">Loading feedback…</p> : aiFeedback?.recent?.length ? (
+              <div className="divide-y divide-violet-50">
+                {aiFeedback.recent.map((entry) => (
+                  <article key={entry._id} className="grid gap-2 px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-start">
+                    <div><p className="text-sm text-slate-800">“{entry.need}”</p><p className="mt-2 text-xs text-slate-500">Suggested: {entry.recommendations?.map((item) => item.name).join(", ") || "No matching services"}</p></div>
+                    <div className="flex items-center gap-3 sm:flex-col sm:items-end"><span className={`text-xs font-bold ${entry.helpful ? "text-emerald-700" : "text-rose-700"}`}>{entry.helpful ? "Helpful" : "Not relevant"}</span><time className="text-xs text-slate-400">{formatDate(entry.feedbackAt)}</time></div>
+                  </article>
+                ))}
+              </div>
+            ) : <p className="px-6 py-8 text-center text-sm text-slate-500">{aiFeedback?.totalRequests ? "No ratings yet. Feedback will appear here when customers rate AI recommendations." : "No service finder requests yet."}</p>}
+          </div>
+          <p className="mt-2 text-xs text-slate-500">Helpful rate is based only on customers who submitted a rating.</p>
+        </section>
+
         <section>
           <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>

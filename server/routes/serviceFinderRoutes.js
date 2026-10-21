@@ -1,7 +1,65 @@
 import express from "express"
+import mongoose from "mongoose"
 import Product from "../models/Product.js"
+import ServiceFinderSession from "../models/ServiceFinderSession.js"
+import adminProtect from "../middleware/adminAuth.js"
 
 const router = express.Router()
+
+router.get("/feedback/admin", adminProtect, async (_req, res) => {
+  try {
+    const [totalRequests, ratedRequests, helpfulRequests, recent] = await Promise.all([
+      ServiceFinderSession.countDocuments(),
+      ServiceFinderSession.countDocuments({ helpful: { $ne: null } }),
+      ServiceFinderSession.countDocuments({ helpful: true }),
+      ServiceFinderSession.find({ helpful: { $ne: null } })
+        .sort({ feedbackAt: -1 })
+        .limit(30)
+        .select("need recommendations helpful feedbackAt createdAt")
+        .lean(),
+    ])
+
+    res.json({
+      totalRequests,
+      ratedRequests,
+      helpfulRequests,
+      helpfulRate: ratedRequests ? Math.round((helpfulRequests / ratedRequests) * 100) : null,
+      recent,
+    })
+  } catch (error) {
+    console.error("Could not load service finder feedback:", error.message)
+    res.status(500).json({ message: "Could not load service finder feedback" })
+  }
+})
+
+router.post("/feedback/:id", async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid recommendation ID" })
+  }
+  if (typeof req.body?.helpful !== "boolean") {
+    return res.status(400).json({ message: "Choose whether the recommendation was helpful" })
+  }
+
+  try {
+    const session = await ServiceFinderSession.findOneAndUpdate(
+      { _id: req.params.id, helpful: null },
+      { helpful: req.body.helpful, feedbackAt: new Date() },
+      { new: true },
+    ).select("_id helpful feedbackAt")
+
+    if (!session) {
+      const exists = await ServiceFinderSession.exists({ _id: req.params.id })
+      return res.status(exists ? 409 : 404).json({
+        message: exists ? "Feedback has already been recorded" : "Recommendation session not found",
+      })
+    }
+
+    return res.json({ message: "Thanks for helping us improve recommendations", feedback: session })
+  } catch (error) {
+    console.error("Could not save service finder feedback:", error.message)
+    return res.status(500).json({ message: "Could not save your feedback" })
+  }
+})
 
 const responseSchema = {
   type: "object",
@@ -34,7 +92,9 @@ router.post("/recommend", async (req, res) => {
       .lean()
 
     if (products.length === 0) {
+      const session = await ServiceFinderSession.create({ need, recommendations: [] })
       return res.json({
+        requestId: String(session._id),
         message: "There are no services in the catalog to recommend yet.",
         recommendations: [],
       })
@@ -81,8 +141,29 @@ router.post("/recommend", async (req, res) => {
     })
 
     if (!aiResponse.ok) {
-      console.error("Service finder API error:", aiResponse.status)
-      return res.status(502).json({ message: "The service finder could not respond right now. Please try again." })
+      const errorBody = await aiResponse.json().catch(() => ({}))
+      const apiError = errorBody?.error || {}
+      // Keep credentials private while logging the API's actual diagnostic.
+      console.error("Service finder API error:", {
+        status: aiResponse.status,
+        type: apiError.type,
+        code: apiError.code,
+        message: apiError.message,
+      })
+
+      if (aiResponse.status === 401 || aiResponse.status === 403) {
+        return res.status(502).json({ message: "The service finder API key is invalid or does not have access. Check OPENAI_API_KEY in server/.env." })
+      }
+      if (aiResponse.status === 404) {
+        return res.status(502).json({ message: "The configured AI model is unavailable. Check OPENAI_MODEL in server/.env." })
+      }
+      if (aiResponse.status === 429) {
+        return res.status(503).json({ message: "The service finder has reached its API usage limit. Try again later or check your OpenAI billing and limits." })
+      }
+      if (aiResponse.status === 400) {
+        return res.status(502).json({ message: "The AI service rejected the request. Check the server console for the service finder API error." })
+      }
+      return res.status(502).json({ message: "The service finder could not reach its AI provider. Check the server console for details." })
     }
 
     const result = await aiResponse.json()
@@ -108,13 +189,25 @@ router.post("/recommend", async (req, res) => {
         price,
       }))
 
+    const session = await ServiceFinderSession.create({
+      need,
+      recommendations: recommendations.map((product) => ({
+        productId: String(product._id),
+        name: product.name,
+      })),
+    })
+
     return res.json({
+      requestId: String(session._id),
       message: typeof parsed.message === "string" ? parsed.message : "Here are a few services that may help.",
       recommendations,
     })
   } catch (error) {
-    console.error("Service finder request failed:", error.message)
-    return res.status(502).json({ message: "The service finder could not respond right now. Please try again." })
+    console.error("Service finder request failed:", error)
+    if (error.name === "TimeoutError" || error.name === "AbortError") {
+      return res.status(504).json({ message: "The service finder took too long to respond. Please try again." })
+    }
+    return res.status(502).json({ message: "The service finder could not respond. Check the server console for details." })
   }
 })
 
